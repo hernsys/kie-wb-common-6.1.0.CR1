@@ -30,7 +30,7 @@ import org.uberfire.workbench.model.impl.PerspectiveDefinitionImpl;
  * A Perspective to show the Home Page
  */
 @ApplicationScoped
-@WorkbenchPerspective(identifier = "org.kie.workbench.common.screens.home.client.perspectives.HomePerspective", isDefault = true)
+@WorkbenchPerspective(identifier = "org.kie.workbench.common.screens.home.client.perspectives.HomePerspective", isDefault = false)
 public class HomePerspective {
 
     @Perspective
