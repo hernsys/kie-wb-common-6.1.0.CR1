@@ -531,8 +531,6 @@ public abstract class BaseViewPresenter implements ViewPresenter {
     
     @Override
     public void loadItemSelected( Object _item ) {
-    	Window.setTitle("Current asset - " + ((Path) _item).getFileName());
-    	Window.alert("Current asset - " + ((Path) _item).getFileName());
     	Window.alert("(Path) _item - " + (Path) _item);
         placeManager.goTo( (Path) _item );
     }
