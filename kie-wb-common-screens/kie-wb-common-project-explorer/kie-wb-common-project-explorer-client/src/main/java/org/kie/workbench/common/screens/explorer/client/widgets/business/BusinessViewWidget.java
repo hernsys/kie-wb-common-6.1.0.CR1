@@ -70,9 +70,12 @@ import org.uberfire.client.workbench.type.ClientResourceType;
 @ApplicationScoped
 public class BusinessViewWidget extends Composite implements View {
 	
-	private static final String CURRENT_RESOURCE = "hiring.bpmn2";
+	//private static final String CURRENT_RESOURCE = "hiring.bpmn2";
 	//private static final String CURRENT_RESOURCE = "Descuentos.drl";
 	//private static final String CURRENT_RESOURCE = "empty.gdst";
+	//private static final String CURRENT_RESOURCE = "empty.dsl";
+	private static final String CURRENT_RESOURCE = "empty.xls";
+	
 
 	private static Object _item = null;
 

@@ -61,6 +61,7 @@ public class DefaultEditorServiceImpl
                       final Metadata metadata,
                       final String comment ) {
         try {
+        	System.out.println("************Hernsys DefaultEditorServiceImpl save");
             ioService.write( Paths.convert( resource ),
                              content,
                              metadataService.setUpAttributes( resource,
