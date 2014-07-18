@@ -29,14 +29,9 @@ import javax.inject.Inject;
 
 import com.github.gwtbootstrap.client.ui.Collapse;
 import com.github.gwtbootstrap.client.ui.CollapseTrigger;
-import com.github.gwtbootstrap.client.ui.Divider;
-import com.github.gwtbootstrap.client.ui.Label;
-import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavList;
 import com.github.gwtbootstrap.client.ui.WellNavList;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -47,7 +42,6 @@ import com.google.gwt.user.client.ui.Widget;
 import org.guvnor.common.services.project.model.Project;
 import org.kie.workbench.common.screens.explorer.client.resources.i18n.ProjectExplorerConstants;
 import org.kie.workbench.common.screens.explorer.client.utils.Classifier;
-import org.kie.workbench.common.screens.explorer.client.utils.Utils;
 import org.kie.workbench.common.screens.explorer.client.widgets.View;
 import org.kie.workbench.common.screens.explorer.client.widgets.ViewPresenter;
 import org.kie.workbench.common.screens.explorer.client.widgets.navigator.Explorer;
@@ -62,7 +56,6 @@ import org.uberfire.backend.repositories.Repository;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.common.BusyPopup;
-import org.uberfire.client.workbench.type.AnyResourceType;
 import org.uberfire.client.workbench.type.ClientResourceType;
 import org.uberfire.backend.vfs.FileSystem;
 
@@ -158,14 +151,6 @@ public class BusinessViewWidget extends Composite implements View {
             final Iterator<Map.Entry<ClientResourceType, Collection<FolderItem>>> itr = sortedResourceTypeGroups.entrySet().iterator();
             while ( itr.hasNext() ) {
                 final Map.Entry<ClientResourceType, Collection<FolderItem>> e = itr.next();
-
-                final CollapseTrigger collapseTrigger = makeTriggerWidget( e.getKey() );
-
-                final Collapse collapse = new Collapse();
-                collapse.setExistTrigger( true );
-                collapse.setId( getCollapseId( e.getKey() ) );
-                final NavList itemsNavList = new NavList();
-                collapse.add( itemsNavList );
                 for ( FolderItem folderItem : e.getValue() ) {
                 	if(folderItem.getItem() != null && folderItem.getType().equals( FolderItemType.FILE ) && folderItem.getItem() instanceof Path){
                 		fs = ((PathFactory.PathImpl) folderItem.getItem()).getFileSystem();
@@ -173,18 +158,8 @@ public class BusinessViewWidget extends Composite implements View {
                 	}
                 }
                 if(fs != null) break;
-                collapse.setDefaultOpen( false );
-
-                /*itemsContainer.add( collapseTrigger );
-                itemsContainer.add( collapse );
-                if ( itr.hasNext() ) {
-                    itemsContainer.add( new Divider() );
-                }*/
             }
             loadResource();
-            
-            
-            
         } else {
         	Window.alert(ProjectExplorerConstants.INSTANCE.noItemsExist() );
         }
