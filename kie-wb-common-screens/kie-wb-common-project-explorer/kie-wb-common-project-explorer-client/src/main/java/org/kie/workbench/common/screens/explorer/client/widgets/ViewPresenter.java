@@ -58,7 +58,10 @@ public interface ViewPresenter extends HasVisibility {
 
     void itemSelected( final FolderItem folderItem );
     
+    //TODO BORRAR
     public void loadItemSelected( Object _item );
+    
+    public void loadItemSelected( org.uberfire.backend.vfs.Path _item );
 
     void refresh();
 

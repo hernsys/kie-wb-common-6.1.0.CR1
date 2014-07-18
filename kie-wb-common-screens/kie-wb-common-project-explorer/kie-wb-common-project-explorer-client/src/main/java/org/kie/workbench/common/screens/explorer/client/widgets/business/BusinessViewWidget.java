@@ -60,9 +60,11 @@ import org.kie.workbench.common.screens.explorer.utils.Sorters;
 import org.uberfire.backend.organizationalunit.OrganizationalUnit;
 import org.uberfire.backend.repositories.Repository;
 import org.uberfire.backend.vfs.Path;
+import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.common.BusyPopup;
 import org.uberfire.client.workbench.type.AnyResourceType;
 import org.uberfire.client.workbench.type.ClientResourceType;
+import org.uberfire.backend.vfs.FileSystem;
 
 /**
  * Business View implementation
@@ -70,14 +72,12 @@ import org.uberfire.client.workbench.type.ClientResourceType;
 @ApplicationScoped
 public class BusinessViewWidget extends Composite implements View {
 	
-	//private static final String CURRENT_RESOURCE = "hiring.bpmn2";
-	//private static final String CURRENT_RESOURCE = "Descuentos.drl";
-	//private static final String CURRENT_RESOURCE = "empty.gdst";
-	//private static final String CURRENT_RESOURCE = "empty.dsl";
-	private static final String CURRENT_RESOURCE = "empty.xls";
+	private static final String RESOURCE_NOT_FOUND = "Resource not found";
+	private static final String DEFAULT = "default";
+	private static FileSystem fs;
 	
 
-	private static Object _item = null;
+	private static Path path = null;
 
     interface BusinessViewImplBinder
             extends
@@ -143,7 +143,6 @@ public class BusinessViewWidget extends Composite implements View {
 
     @Override
     public void setItems( final FolderListing folderListing ) {
-        itemsContainer.clear();
         sortedFolderItems.clear();
         for ( final FolderItem content : folderListing.getContent() ) {
             if ( !content.getType().equals( FolderItemType.FOLDER ) ) {
@@ -168,24 +167,26 @@ public class BusinessViewWidget extends Composite implements View {
                 final NavList itemsNavList = new NavList();
                 collapse.add( itemsNavList );
                 for ( FolderItem folderItem : e.getValue() ) {
-                	if(folderItem.getItem()!=null){
-                		setResourceToLoad(folderItem );
+                	if(folderItem.getItem() != null && folderItem.getType().equals( FolderItemType.FILE ) && folderItem.getItem() instanceof Path){
+                		fs = ((PathFactory.PathImpl) folderItem.getItem()).getFileSystem();
+                		break;
                 	}
                 }
+                if(fs != null) break;
                 collapse.setDefaultOpen( false );
 
-                itemsContainer.add( collapseTrigger );
+                /*itemsContainer.add( collapseTrigger );
                 itemsContainer.add( collapse );
                 if ( itr.hasNext() ) {
                     itemsContainer.add( new Divider() );
-                }
+                }*/
             }
-            loadResourceSelected();
+            loadResource();
             
             
             
         } else {
-            itemsContainer.add( new Label( ProjectExplorerConstants.INSTANCE.noItemsExist() ) );
+        	Window.alert(ProjectExplorerConstants.INSTANCE.noItemsExist() );
         }
     }
 
@@ -223,40 +224,15 @@ public class BusinessViewWidget extends Composite implements View {
         return description;
     }
 
-    private IsWidget makeItemNavLink( final ClientResourceType resourceType,
-                                      final FolderItem folderItem ) {
-        String fileName = folderItem.getFileName();
-        if ( !( resourceType instanceof AnyResourceType ) ) {
-            fileName = Utils.getBaseFileName( fileName );
+    private void loadResource(){
+    	String nameRepo = getNameRepo(Window.Location.getHref());
+        if(nameRepo != null){
+        	path = PathFactory.newPath(fs, getFileName(Window.Location.getHref()), nameRepo);
+        	presenter.loadItemSelected( path );
+        }else{
+        	Window.alert(RESOURCE_NOT_FOUND);
         }
-        fileName = fileName.replaceAll( " ", "\u00a0" );
-        final NavLink navLink = new NavLink( fileName );
-        navLink.addClickHandler( new ClickHandler() {
-
-            @Override
-            public void onClick( ClickEvent event ) {
-            	Window.alert("click en el boton del resurso");
-                presenter.itemSelected( folderItem );
-            }
-        } );
-        return navLink;
     }
-    
-    private void setResourceToLoad(final FolderItem folderItem){
-        if ( folderItem.getType().equals( FolderItemType.FILE ) && folderItem.getItem() instanceof Path ) {
-        	if(((Path) folderItem.getItem()).getFileName().indexOf(CURRENT_RESOURCE) > -1){	
-        		_item = folderItem.getItem();
-        	}
-        } 
-    }
-    
-    private void loadResourceSelected(){
-    	if(_item != null){
-    		presenter.loadItemSelected( _item );
-    	}
-    }
-    
-    
 
     private String getCollapseId( ClientResourceType resourceType ) {
         return resourceType != null ? resourceType.getShortName().replaceAll( ID_CLEANUP_PATTERN, "" ) : "";
@@ -270,6 +246,15 @@ public class BusinessViewWidget extends Composite implements View {
     @Override
     public void hideBusyIndicator() {
         BusyPopup.close();
+    }
+    
+    private String getNameRepo(String hrefValue){
+        String[] repo = hrefValue.split("#" + DEFAULT);
+        return (repo.length == 1) ? null : DEFAULT + repo[1]; 
+    }
+    
+    private String getFileName(String hrefValue){
+        return hrefValue.split("/")[hrefValue.split("/").length - 1];
     }
 
 }

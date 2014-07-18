@@ -16,6 +16,7 @@
   <description>Kie Workbench - Common - Project Explorer Client</description>
 
   <dependencies>
+  
     <dependency>
       <groupId>org.kie.workbench.screens</groupId>
       <artifactId>kie-wb-common-project-explorer-api</artifactId>
