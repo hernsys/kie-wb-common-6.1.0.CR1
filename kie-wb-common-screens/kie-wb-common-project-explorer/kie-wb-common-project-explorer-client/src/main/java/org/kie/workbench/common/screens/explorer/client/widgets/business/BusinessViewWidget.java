@@ -27,16 +27,12 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import com.github.gwtbootstrap.client.ui.Collapse;
-import com.github.gwtbootstrap.client.ui.CollapseTrigger;
-import com.github.gwtbootstrap.client.ui.NavList;
 import com.github.gwtbootstrap.client.ui.WellNavList;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 import org.guvnor.common.services.project.model.Project;
@@ -79,8 +75,6 @@ public class BusinessViewWidget extends Composite implements View {
     }
 
     private static BusinessViewImplBinder uiBinder = GWT.create( BusinessViewImplBinder.class );
-
-    private static final String ID_CLEANUP_PATTERN = "[^a-zA-Z0-9]";
 
     @UiField
     Explorer explorer;
@@ -150,19 +144,29 @@ public class BusinessViewWidget extends Composite implements View {
 
             final Iterator<Map.Entry<ClientResourceType, Collection<FolderItem>>> itr = sortedResourceTypeGroups.entrySet().iterator();
             while ( itr.hasNext() ) {
-                final Map.Entry<ClientResourceType, Collection<FolderItem>> e = itr.next();
-                for ( FolderItem folderItem : e.getValue() ) {
-                	if(folderItem.getItem() != null && folderItem.getType().equals( FolderItemType.FILE ) && folderItem.getItem() instanceof Path){
-                		fs = ((PathFactory.PathImpl) folderItem.getItem()).getFileSystem();
-                		break;
-                	}
-                }
+            	readFolderItem(itr.next());
                 if(fs != null) break;
             }
             loadResource();
         } else {
         	Window.alert(ProjectExplorerConstants.INSTANCE.noItemsExist() );
         }
+    }
+    
+    private void readFolderItem(Map.Entry<ClientResourceType, Collection<FolderItem>> e){
+    	for ( FolderItem folderItem : e.getValue() ) {
+        	if(folderItem.getItem() != null && folderItem.getType().equals( FolderItemType.FILE ) && folderItem.getItem() instanceof Path){
+        		setFsByFile(folderItem);
+        		if(fs != null) break;
+        	}
+        }
+    }
+    
+    private void setFsByFile(FolderItem folderItem){
+    	PathFactory.PathImpl pathImpl = (PathFactory.PathImpl) folderItem.getItem();
+    	if(pathImpl.getFileName().equals(getFileName(Window.Location.getHref()))){
+    		fs = pathImpl.getFileSystem();
+    	}
     }
 
     @Override
@@ -179,26 +183,6 @@ public class BusinessViewWidget extends Composite implements View {
         return explorer;
     }
 
-    private CollapseTrigger makeTriggerWidget( final ClientResourceType resourceType ) {
-        final CollapseTrigger collapseTrigger = new CollapseTrigger( "#" + getCollapseId( resourceType ) );
-        final String description = getResourceTypeDescription( resourceType );
-        final IsWidget icon = resourceType.getIcon();
-        if ( icon == null ) {
-            collapseTrigger.setWidget( new TriggerWidget( description ) );
-        } else {
-            collapseTrigger.setWidget( new TriggerWidget( icon,
-                                                          description ) );
-
-        }
-        return collapseTrigger;
-    }
-
-    private String getResourceTypeDescription( final ClientResourceType resourceType ) {
-        String description = resourceType.getDescription();
-        description = ( description == null || description.isEmpty() ) ? ProjectExplorerConstants.INSTANCE.miscellaneous_files() : description;
-        return description;
-    }
-
     private void loadResource(){
     	String nameRepo = getNameRepo(Window.Location.getHref());
         if(nameRepo != null){
@@ -207,10 +191,6 @@ public class BusinessViewWidget extends Composite implements View {
         }else{
         	Window.alert(RESOURCE_NOT_FOUND);
         }
-    }
-
-    private String getCollapseId( ClientResourceType resourceType ) {
-        return resourceType != null ? resourceType.getShortName().replaceAll( ID_CLEANUP_PATTERN, "" ) : "";
     }
 
     @Override
