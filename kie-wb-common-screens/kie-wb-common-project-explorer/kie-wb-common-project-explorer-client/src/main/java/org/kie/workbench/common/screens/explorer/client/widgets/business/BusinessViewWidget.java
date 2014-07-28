@@ -41,7 +41,6 @@ import org.kie.workbench.common.screens.explorer.client.utils.Classifier;
 import org.kie.workbench.common.screens.explorer.client.widgets.View;
 import org.kie.workbench.common.screens.explorer.client.widgets.ViewPresenter;
 import org.kie.workbench.common.screens.explorer.client.widgets.navigator.Explorer;
-import org.kie.workbench.common.screens.explorer.client.widgets.navigator.NavigatorOptions;
 import org.kie.workbench.common.screens.explorer.model.FolderItem;
 import org.kie.workbench.common.screens.explorer.model.FolderItemType;
 import org.kie.workbench.common.screens.explorer.model.FolderListing;
@@ -88,16 +87,6 @@ public class BusinessViewWidget extends Composite implements View {
     //TreeSet sorts members upon insertion
     private final Set<FolderItem> sortedFolderItems = new TreeSet<FolderItem>( Sorters.ITEM_SORTER );
 
-    private final NavigatorOptions businessOptions = new NavigatorOptions() {{
-        showFiles( false );
-        showHiddenFiles( false );
-        showDirectories( true );
-        allowUpLink( false );
-        showItemAge( false );
-        showItemMessage( false );
-        showItemLastUpdater( false );
-    }};
-
     private ViewPresenter presenter;
 
     @PostConstruct
@@ -109,7 +98,6 @@ public class BusinessViewWidget extends Composite implements View {
     @Override
     public void init( final ViewPresenter presenter ) {
         this.presenter = presenter;
-        explorer.init( Explorer.Mode.COLLAPSED, businessOptions, Explorer.NavType.TREE, presenter );
     }
 
     @Override
@@ -121,11 +109,12 @@ public class BusinessViewWidget extends Composite implements View {
                             final Project project,
                             final FolderListing folderListing,
                             final Map<FolderItem, List<FolderItem>> siblings ) {
-        explorer.setupHeader( organizationalUnits, organizationalUnit,
-                              repositories, repository,
-                              projects, project );
-        explorer.loadContent( folderListing, siblings );
-        setItems( folderListing );
+        if(getNameRepo(Window.Location.getHref()) != null){
+        	setItems( folderListing );
+        }else{
+        	Window.alert(RESOURCE_NOT_FOUND);
+        }
+    	
     }
 
     @Override
@@ -171,11 +160,6 @@ public class BusinessViewWidget extends Composite implements View {
 
     @Override
     public void setOptions( final Set<Option> options ) {
-        if ( options.contains( Option.TREE_NAVIGATOR ) ) {
-            explorer.setNavType( Explorer.NavType.TREE, businessOptions );
-        } else {
-            explorer.setNavType( Explorer.NavType.BREADCRUMB, businessOptions );
-        }
     }
 
     @Override

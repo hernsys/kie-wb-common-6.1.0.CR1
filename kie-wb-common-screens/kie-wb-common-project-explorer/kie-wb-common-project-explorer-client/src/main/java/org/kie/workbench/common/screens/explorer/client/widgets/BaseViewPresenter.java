@@ -518,21 +518,12 @@ public abstract class BaseViewPresenter implements ViewPresenter {
 
     @Override
     public void itemSelected( final FolderItem folderItem ) {
-        final Object _item = folderItem.getItem();
-        if ( _item == null ) {
-            return;
-        }
-        if ( folderItem.getType().equals( FolderItemType.FILE ) && _item instanceof Path ) {
-            placeManager.goTo( (Path) _item );
-        } else {
-            activeFolderItemSelected( folderItem );
-        }
     }
     
     @Override
     public void loadItemSelected( Path _item ) {
     	Window.setTitle("Asset " + _item.getFileName());
-    	Window.alert("- File Name - " +  _item.getFileName());
+    	Window.alert("Asset: " +  _item.getFileName());
         placeManager.goTo( _item );
     }
     
