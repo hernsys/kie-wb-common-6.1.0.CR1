@@ -27,10 +27,8 @@ public class SaveOperationService {
         checkNotNull("command", saveCommand);
 
         if (path.getFileSystem().supportedFileAttributeViews().contains("version")) {
-        	System.out.println("**** hernsys new SavePopup");
             new SavePopup(saveCommand).show();
         } else {
-        	System.out.println("**** hernsys saveCommand.execute");
             saveCommand.execute("");
         }
     }

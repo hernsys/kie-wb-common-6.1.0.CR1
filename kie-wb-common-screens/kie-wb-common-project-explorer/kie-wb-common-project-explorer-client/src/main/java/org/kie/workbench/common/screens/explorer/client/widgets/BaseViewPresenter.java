@@ -62,6 +62,8 @@ import org.uberfire.backend.repositories.Repository;
 import org.uberfire.backend.repositories.RepositoryRemovedEvent;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.client.mvp.PlaceManager;
+import org.uberfire.mvp.PlaceRequest;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.rpc.SessionInfo;
 import org.uberfire.security.Identity;
 import org.uberfire.security.impl.authz.RuntimeAuthorizationManager;
@@ -71,11 +73,15 @@ import org.uberfire.workbench.events.ResourceCopiedEvent;
 import org.uberfire.workbench.events.ResourceDeletedEvent;
 import org.uberfire.workbench.events.ResourceRenamedEvent;
 
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 
 public abstract class BaseViewPresenter implements ViewPresenter {
 
-    @Inject
+	//private static final int MLS = 2500; //is correct
+	private static final int MLS = 1000;
+
+	@Inject
     protected Identity identity;
 
     @Inject
@@ -519,12 +525,21 @@ public abstract class BaseViewPresenter implements ViewPresenter {
     @Override
     public void itemSelected( final FolderItem folderItem ) {
     }
-    
+
     @Override
-    public void loadItemSelected( Path _item ) {
-    	Window.setTitle("Asset " + _item.getFileName());
-    	Window.alert("Asset: " +  _item.getFileName());
-        placeManager.goTo( _item );
+    public void loadItemSelected( final Path _itemPath,  final String readOnly) {
+    	Window.setTitle("Asset " + _itemPath.getFileName());
+    	getView().showBusyIndicator( CommonConstants.INSTANCE.Loading());
+    	Timer timer = new Timer() {
+            @Override
+            public void run() {
+            	PlaceRequest placeRequestImpl = new DefaultPlaceRequest();
+                placeRequestImpl.addParameter("readOnly", readOnly);
+            	placeManager.goTo( _itemPath, placeRequestImpl );
+            	getView().hideBusyIndicator();
+            }
+        };
+        timer.schedule(MLS);
     }
     
     

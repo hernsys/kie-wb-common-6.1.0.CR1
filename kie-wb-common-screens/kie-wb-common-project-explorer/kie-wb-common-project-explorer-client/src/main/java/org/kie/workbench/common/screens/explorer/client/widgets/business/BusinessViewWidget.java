@@ -25,7 +25,28 @@ import java.util.TreeSet;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+
+import org.guvnor.common.services.project.model.Project;
+import org.kie.workbench.common.screens.explorer.client.resources.i18n.ProjectExplorerConstants;
+import org.kie.workbench.common.screens.explorer.client.utils.Classifier;
+import org.kie.workbench.common.screens.explorer.client.widgets.View;
+import org.kie.workbench.common.screens.explorer.client.widgets.ViewPresenter;
+import org.kie.workbench.common.screens.explorer.client.widgets.navigator.Explorer;
+import org.kie.workbench.common.screens.explorer.model.AssetEvent;
+import org.kie.workbench.common.screens.explorer.model.FolderItem;
+import org.kie.workbench.common.screens.explorer.model.FolderItemType;
+import org.kie.workbench.common.screens.explorer.model.FolderListing;
+import org.kie.workbench.common.screens.explorer.service.Option;
+import org.kie.workbench.common.screens.explorer.utils.Sorters;
+import org.uberfire.backend.organizationalunit.OrganizationalUnit;
+import org.uberfire.backend.repositories.Repository;
+import org.uberfire.backend.vfs.FileSystem;
+import org.uberfire.backend.vfs.Path;
+import org.uberfire.backend.vfs.PathFactory;
+import org.uberfire.client.common.BusyPopup;
+import org.uberfire.client.workbench.type.ClientResourceType;
 
 import com.github.gwtbootstrap.client.ui.WellNavList;
 import com.google.gwt.core.client.GWT;
@@ -35,39 +56,20 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import org.guvnor.common.services.project.model.Project;
-import org.kie.workbench.common.screens.explorer.client.resources.i18n.ProjectExplorerConstants;
-import org.kie.workbench.common.screens.explorer.client.utils.Classifier;
-import org.kie.workbench.common.screens.explorer.client.widgets.View;
-import org.kie.workbench.common.screens.explorer.client.widgets.ViewPresenter;
-import org.kie.workbench.common.screens.explorer.client.widgets.navigator.Explorer;
-import org.kie.workbench.common.screens.explorer.model.FolderItem;
-import org.kie.workbench.common.screens.explorer.model.FolderItemType;
-import org.kie.workbench.common.screens.explorer.model.FolderListing;
-import org.kie.workbench.common.screens.explorer.service.Option;
-import org.kie.workbench.common.screens.explorer.utils.Sorters;
-import org.uberfire.backend.organizationalunit.OrganizationalUnit;
-import org.uberfire.backend.repositories.Repository;
-import org.uberfire.backend.vfs.Path;
-import org.uberfire.backend.vfs.PathFactory;
-import org.uberfire.client.common.BusyPopup;
-import org.uberfire.client.workbench.type.ClientResourceType;
-import org.uberfire.backend.vfs.FileSystem;
-
 /**
  * Business View implementation
  */
 @ApplicationScoped
 public class BusinessViewWidget extends Composite implements View {
 	
+	private static final String PARAM_READONLY = "readOnly";
+	private static final String PARAM_REPOSITORY = "repository";
 	private static final String RESOURCE_NOT_FOUND = "Resource not found";
-	private static final String DEFAULT = "default";
+	private static final String DEFAULT = "default:";
 	private static FileSystem fs;
-	
-
 	private static Path path = null;
 
-    interface BusinessViewImplBinder
+	interface BusinessViewImplBinder
             extends
             UiBinder<Widget, BusinessViewWidget> {
 
@@ -115,6 +117,24 @@ public class BusinessViewWidget extends Composite implements View {
         	Window.alert(RESOURCE_NOT_FOUND);
         }
     	
+    	
+    	/*String nameRepo = null;
+    	int cont=0;
+    	do{
+    		cont++;
+    		nameRepo = getNameRepo(Window.Location.getHref());
+    		if(cont==500) break;
+    	}while(nameRepo == null);
+    	setItems( folderListing );*/
+    }
+    
+    public void drawNamesNode(@Observes AssetEvent assetEvent) {
+    	//Window.alert(assetEvent.getUrl() + " fs: " +  fs);
+    	/*if(fs != null){
+    		loadResource();
+    	}else{
+    		Window.alert(" fs: " +  fs);
+    	}*/
     }
 
     @Override
@@ -171,7 +191,9 @@ public class BusinessViewWidget extends Composite implements View {
     	String nameRepo = getNameRepo(Window.Location.getHref());
         if(nameRepo != null){
         	path = PathFactory.newPath(fs, getFileName(Window.Location.getHref()), nameRepo);
-        	presenter.loadItemSelected( path );
+        	if(path != null){
+        		presenter.loadItemSelected( path, editorReadOnly() );
+        	}
         }else{
         	Window.alert(RESOURCE_NOT_FOUND);
         }
@@ -188,12 +210,18 @@ public class BusinessViewWidget extends Composite implements View {
     }
     
     private String getNameRepo(String hrefValue){
-        String[] repo = hrefValue.split("#" + DEFAULT);
-        return (repo.length == 1) ? null : DEFAULT + repo[1]; 
+    	return (Window.Location.getParameter(PARAM_REPOSITORY) == null) ? null : Window.Location.getParameter(PARAM_REPOSITORY);  
     }
     
+    private String editorReadOnly(){
+    	return (Window.Location.getParameter(PARAM_READONLY) != null && Window.Location.getParameter(PARAM_READONLY).equals("true")) 
+    			? "true" : null;
+    }
+    
+    
     private String getFileName(String hrefValue){
-        return hrefValue.split("/")[hrefValue.split("/").length - 1];
+    	String nameRepo = getNameRepo(hrefValue);
+        return nameRepo.split("/")[nameRepo.split("/").length - 1];
     }
 
 }

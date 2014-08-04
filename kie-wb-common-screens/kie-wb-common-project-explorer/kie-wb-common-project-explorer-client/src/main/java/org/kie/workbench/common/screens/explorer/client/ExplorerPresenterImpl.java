@@ -133,19 +133,6 @@ public class ExplorerPresenterImpl implements ExplorerPresenter {
             }
         } );
 
-//        hiddenFiles.setIconSize( IconSize.SMALL );
-//        hiddenFiles.addClickHandler( new ClickHandler() {
-//            @Override
-//            public void onClick( ClickEvent clickEvent ) {
-//                if ( options.contains( Option.EXCLUDE_HIDDEN_ITEMS ) ) {
-//                    includeHiddenItems();
-//                } else {
-//                    excludeHiddenItems();
-//                }
-//                update();
-//            }
-//        } );
-
         treeExplorer.setIconSize( IconSize.SMALL );
         treeExplorer.addClickHandler( new ClickHandler() {
             @Override
