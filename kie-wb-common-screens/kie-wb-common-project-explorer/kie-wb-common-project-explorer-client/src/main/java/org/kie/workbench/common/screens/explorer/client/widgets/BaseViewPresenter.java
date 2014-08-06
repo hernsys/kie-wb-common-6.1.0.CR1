@@ -535,7 +535,7 @@ public abstract class BaseViewPresenter implements ViewPresenter {
             public void run() {
             	PlaceRequest placeRequestImpl = new DefaultPlaceRequest();
                 placeRequestImpl.addParameter("readOnly", readOnly);
-            	placeManager.goTo( _itemPath, placeRequestImpl );
+               	placeManager.goTo( _itemPath, placeRequestImpl );
             	getView().hideBusyIndicator();
             }
         };

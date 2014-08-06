@@ -25,7 +25,6 @@ import java.util.TreeSet;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.guvnor.common.services.project.model.Project;
@@ -34,7 +33,6 @@ import org.kie.workbench.common.screens.explorer.client.utils.Classifier;
 import org.kie.workbench.common.screens.explorer.client.widgets.View;
 import org.kie.workbench.common.screens.explorer.client.widgets.ViewPresenter;
 import org.kie.workbench.common.screens.explorer.client.widgets.navigator.Explorer;
-import org.kie.workbench.common.screens.explorer.model.AssetEvent;
 import org.kie.workbench.common.screens.explorer.model.FolderItem;
 import org.kie.workbench.common.screens.explorer.model.FolderItemType;
 import org.kie.workbench.common.screens.explorer.model.FolderListing;
@@ -65,7 +63,6 @@ public class BusinessViewWidget extends Composite implements View {
 	private static final String PARAM_READONLY = "readOnly";
 	private static final String PARAM_REPOSITORY = "repository";
 	private static final String RESOURCE_NOT_FOUND = "Resource not found";
-	private static final String DEFAULT = "default:";
 	private static FileSystem fs;
 	private static Path path = null;
 
@@ -116,27 +113,8 @@ public class BusinessViewWidget extends Composite implements View {
         }else{
         	Window.alert(RESOURCE_NOT_FOUND);
         }
-    	
-    	
-    	/*String nameRepo = null;
-    	int cont=0;
-    	do{
-    		cont++;
-    		nameRepo = getNameRepo(Window.Location.getHref());
-    		if(cont==500) break;
-    	}while(nameRepo == null);
-    	setItems( folderListing );*/
     }
     
-    public void drawNamesNode(@Observes AssetEvent assetEvent) {
-    	//Window.alert(assetEvent.getUrl() + " fs: " +  fs);
-    	/*if(fs != null){
-    		loadResource();
-    	}else{
-    		Window.alert(" fs: " +  fs);
-    	}*/
-    }
-
     @Override
     public void setItems( final FolderListing folderListing ) {
         sortedFolderItems.clear();
