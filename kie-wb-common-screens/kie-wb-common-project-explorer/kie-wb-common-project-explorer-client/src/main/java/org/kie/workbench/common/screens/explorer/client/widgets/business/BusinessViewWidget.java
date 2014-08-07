@@ -60,6 +60,8 @@ import com.google.gwt.user.client.ui.Widget;
 @ApplicationScoped
 public class BusinessViewWidget extends Composite implements View {
 	
+	private static final String PATH_RESOURCE = "pathResource";
+	private static final String DEFAULT_MASTER = "default://master@";
 	private static final String PARAM_READONLY = "readOnly";
 	private static final String PARAM_REPOSITORY = "repository";
 	private static final String RESOURCE_NOT_FOUND = "Resource not found";
@@ -108,7 +110,7 @@ public class BusinessViewWidget extends Composite implements View {
                             final Project project,
                             final FolderListing folderListing,
                             final Map<FolderItem, List<FolderItem>> siblings ) {
-        if(getNameRepo(Window.Location.getHref()) != null){
+        if(getNameRepo() != null){
         	setItems( folderListing );
         }else{
         	Window.alert(RESOURCE_NOT_FOUND);
@@ -166,7 +168,7 @@ public class BusinessViewWidget extends Composite implements View {
     }
 
     private void loadResource(){
-    	String nameRepo = getNameRepo(Window.Location.getHref());
+    	String nameRepo = getNameRepo();
         if(nameRepo != null){
         	path = PathFactory.newPath(fs, getFileName(Window.Location.getHref()), nameRepo);
         	if(path != null){
@@ -187,8 +189,14 @@ public class BusinessViewWidget extends Composite implements View {
         BusyPopup.close();
     }
     
-    private String getNameRepo(String hrefValue){
-    	return (Window.Location.getParameter(PARAM_REPOSITORY) == null) ? null : Window.Location.getParameter(PARAM_REPOSITORY);  
+    private String getNameRepo(){
+    	String repo = (Window.Location.getParameter(PARAM_REPOSITORY) == null) ? null : Window.Location.getParameter(PARAM_REPOSITORY);  
+    	return DEFAULT_MASTER + repo + getPathResource();  
+    }
+    
+    private String getPathResource(){
+    	String pathResource = (Window.Location.getParameter(PATH_RESOURCE) == null) ? null : Window.Location.getParameter(PATH_RESOURCE);  
+    	return pathResource;
     }
     
     private String editorReadOnly(){
@@ -198,7 +206,7 @@ public class BusinessViewWidget extends Composite implements View {
     
     
     private String getFileName(String hrefValue){
-    	String nameRepo = getNameRepo(hrefValue);
+    	String nameRepo = getNameRepo();
         return nameRepo.split("/")[nameRepo.split("/").length - 1];
     }
 
