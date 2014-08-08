@@ -153,9 +153,7 @@ public class BusinessViewWidget extends Composite implements View {
     
     private void setFsByFile(FolderItem folderItem){
     	PathFactory.PathImpl pathImpl = (PathFactory.PathImpl) folderItem.getItem();
-    	//if(pathImpl.getFileName().equals(getFileName(Window.Location.getHref()))){
-    		fs = pathImpl.getFileSystem();
-    	//}
+   		fs = pathImpl.getFileSystem();
     }
 
     @Override
