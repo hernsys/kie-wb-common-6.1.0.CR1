@@ -73,13 +73,7 @@ import org.uberfire.workbench.events.ResourceCopiedEvent;
 import org.uberfire.workbench.events.ResourceDeletedEvent;
 import org.uberfire.workbench.events.ResourceRenamedEvent;
 
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
-
 public abstract class BaseViewPresenter implements ViewPresenter {
-
-	//private static final int MLS = 2500; //is correct
-	private static final int MLS = 1000;
 
 	@Inject
     protected Identity identity;
@@ -98,6 +92,8 @@ public abstract class BaseViewPresenter implements ViewPresenter {
 
     @Inject
     protected PlaceManager placeManager;
+    
+    private PlaceRequest place;
 
     @Inject
     protected Event<BuildResults> buildResultsEvent;
@@ -110,7 +106,9 @@ public abstract class BaseViewPresenter implements ViewPresenter {
 
     @Inject
     private SyncBeanManager iocBeanManager;
-
+    
+    
+    
     //Active context
     protected OrganizationalUnit activeOrganizationalUnit = null;
     protected Repository activeRepository = null;
@@ -397,6 +395,7 @@ public abstract class BaseViewPresenter implements ViewPresenter {
                 activeContent = content.getFolderListing();
 
                 getView().getExplorer().clear();
+                //Window.alert("*** doInitialiseViewForActiveContext BaseViewPresenter");
                 getView().setContent( content.getOrganizationalUnits(),
                                       activeOrganizationalUnit,
                                       content.getRepositories(),
@@ -528,22 +527,13 @@ public abstract class BaseViewPresenter implements ViewPresenter {
 
     @Override
     public void loadItemSelected( final Path _itemPath,  final String readOnly) {
-    	Window.setTitle("Asset " + _itemPath.getFileName());
     	getView().showBusyIndicator( CommonConstants.INSTANCE.Loading());
-    	Timer timer = new Timer() {
-            @Override
-            public void run() {
-            	PlaceRequest placeRequestImpl = new DefaultPlaceRequest();
-                placeRequestImpl.addParameter("readOnly", readOnly);
-               	placeManager.goTo( _itemPath, placeRequestImpl );
-            	getView().hideBusyIndicator();
-            }
-        };
-        timer.schedule(MLS);
+    	PlaceRequest placeRequestImpl = new DefaultPlaceRequest();
+        placeRequestImpl.addParameter("readOnly", readOnly);
+       	placeManager.goTo( _itemPath, placeRequestImpl );
+    	getView().hideBusyIndicator();
     }
     
-    
-
     @Override
     public boolean isVisible() {
         return getView().isVisible();
@@ -576,7 +566,6 @@ public abstract class BaseViewPresenter implements ViewPresenter {
         if ( organizationalUnit == null ) {
             return;
         }
-
         refresh( false );
     }
 
@@ -590,7 +579,7 @@ public abstract class BaseViewPresenter implements ViewPresenter {
         }
         if ( authorizationManager.authorize( repository,
                                              identity ) ) {
-            refresh( false );
+        	refresh( false );
         }
     }
 
@@ -815,4 +804,5 @@ public abstract class BaseViewPresenter implements ViewPresenter {
             refresh( false );
         }
     }
+    
 }

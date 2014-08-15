@@ -28,7 +28,7 @@
       <b:Well styleName="{resources.CSS.viewContainer}">
         <w:Explorer ui:field="explorer"/>
         <hr/>
-        <b:WellNavList ui:field="itemsContainer"/>
+        <!-- <b:WellNavList ui:field="itemsContainer"/> -->
       </b:Well>
     </div>
   </g:HTMLPanel>

@@ -23,11 +23,14 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiFactory;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+
 import org.kie.workbench.common.screens.explorer.client.widgets.business.BusinessViewWidget;
 import org.kie.workbench.common.screens.explorer.client.widgets.technical.TechnicalViewWidget;
 import org.uberfire.client.common.BusyPopup;
+import org.uberfire.lifecycle.OnOpen;
 
 /**
  * The Explorer's view implementation
@@ -43,36 +46,30 @@ public class ExplorerViewImpl extends Composite implements ExplorerView {
 
     private static ExplorerViewImplBinder uiBinder = GWT.create( ExplorerViewImplBinder.class );
 
-    @Inject
-    private BusinessViewWidget businessView;
 
-    @Inject
-    private TechnicalViewWidget technicalView;
 
     private ExplorerPresenter presenter;
 
     @PostConstruct
-    public void init() {
-        //Cannot create and bind UI until after injection points have been initialized
+    public void postConstruct() {
+    	//Window..alert("***postConstruct ExplorerViewImpl");
+    	//Cannot create and bind UI until after injection points have been initialized
         initWidget( uiBinder.createAndBindUi( this ) );
 
         getElement().getStyle().setPropertyPx( "minWidth", 370 );
     }
+    
+    @OnOpen
+    public void onOpen(){
+    	//Window..alert("***onOpen ExplorerViewImpl");
+    }
 
     @Override
     public void init( final ExplorerPresenterImpl presenter ) {
+    	//Window..alert("***init ExplorerViewImpl");
         this.presenter = presenter;
     }
 
-    @UiFactory
-    public BusinessViewWidget getBusinessView() {
-        return this.businessView;
-    }
-
-    @UiFactory
-    public TechnicalViewWidget getTechnicalView() {
-        return this.technicalView;
-    }
 
     @Override
     public void showBusyIndicator( final String message ) {

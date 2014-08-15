@@ -79,8 +79,8 @@ public class BusinessViewWidget extends Composite implements View {
     @UiField
     Explorer explorer;
 
-    @UiField
-    WellNavList itemsContainer;
+//    @UiField
+//    WellNavList itemsContainer;
 
     @Inject
     Classifier classifier;
@@ -92,6 +92,7 @@ public class BusinessViewWidget extends Composite implements View {
 
     @PostConstruct
     public void init() {
+    	//Window.alert("***init in BusinessViewWidget");
         //Cannot create and bind UI until after injection points have been initialized
         initWidget( uiBinder.createAndBindUi( this ) );
     }
@@ -110,7 +111,8 @@ public class BusinessViewWidget extends Composite implements View {
                             final Project project,
                             final FolderListing folderListing,
                             final Map<FolderItem, List<FolderItem>> siblings ) {
-        if(getNameRepo() != null){
+    	//Window.alert("***setContent BusinessViewWidget");
+    	if(getNameRepo() != null){
         	setItems( folderListing );
         }else{
         	Window.alert(RESOURCE_NOT_FOUND);
@@ -119,6 +121,7 @@ public class BusinessViewWidget extends Composite implements View {
     
     @Override
     public void setItems( final FolderListing folderListing ) {
+    	
         sortedFolderItems.clear();
         for ( final FolderItem content : folderListing.getContent() ) {
             if ( !content.getType().equals( FolderItemType.FOLDER ) ) {

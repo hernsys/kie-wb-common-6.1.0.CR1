@@ -15,20 +15,17 @@
  */
 package org.kie.workbench.common.screens.explorer.client;
 
+import static com.github.gwtbootstrap.client.ui.resources.ButtonSize.MINI;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
-import com.github.gwtbootstrap.client.ui.Divider;
-import com.github.gwtbootstrap.client.ui.NavLink;
-import com.github.gwtbootstrap.client.ui.constants.IconSize;
-import com.github.gwtbootstrap.client.ui.constants.IconType;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Widget;
 import org.guvnor.common.services.project.context.ProjectContext;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.ErrorCallback;
@@ -46,6 +43,10 @@ import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
 import org.uberfire.client.common.ContextDropdownButton;
 import org.uberfire.client.mvp.UberView;
+import org.uberfire.client.workbench.events.BeforeClosePlaceEvent;
+import org.uberfire.lifecycle.OnClose;
+import org.uberfire.lifecycle.OnStartup;
+import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.Position;
 import org.uberfire.workbench.model.menu.EnabledStateChangeListener;
 import org.uberfire.workbench.model.menu.MenuCustom;
@@ -54,13 +55,20 @@ import org.uberfire.workbench.model.menu.MenuItem;
 import org.uberfire.workbench.model.menu.MenuPosition;
 import org.uberfire.workbench.model.menu.Menus;
 
-import static com.github.gwtbootstrap.client.ui.resources.ButtonSize.*;
+import com.github.gwtbootstrap.client.ui.Divider;
+import com.github.gwtbootstrap.client.ui.NavLink;
+import com.github.gwtbootstrap.client.ui.constants.IconSize;
+import com.github.gwtbootstrap.client.ui.constants.IconType;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Repository, Package, Folder and File explorer
  */
 @ApplicationScoped
-@WorkbenchScreen(identifier = "org.kie.guvnor.explorer")
+@WorkbenchScreen(identifier = "pepe")
 public class ExplorerPresenterImpl implements ExplorerPresenter {
 
     @Inject
@@ -85,29 +93,37 @@ public class ExplorerPresenterImpl implements ExplorerPresenter {
 //    private final NavLink hiddenFiles = new NavLink( "Display hidden items" );
 
     private Set<Option> options = new HashSet<Option>( Arrays.asList( Option.BUSINESS_CONTENT, Option.EXCLUDE_HIDDEN_ITEMS ) );
+    
+    @Inject
+    private Event<BeforeClosePlaceEvent> closePlaceEvent;
+    private PlaceRequest place;
 
     @AfterInitialization
     public void init() {
-        explorerService.call( new RemoteCallback<Set<Option>>() {
-                                  @Override
-                                  public void callback( Set<Option> o ) {
-                                      if ( o != null && !o.isEmpty() ) {
-                                          options.clear();
-                                          options.addAll( o );
-                                      }
-                                      config();
-                                  }
-                              }, new ErrorCallback<Object>() {
-                                  @Override
-                                  public boolean error( Object o,
-                                                        Throwable throwable ) {
-                                      config();
-                                      return false;
-                                  }
-                              }
-                            ).getLastUserOptions();
     }
-
+    
+    @OnStartup
+    public void onStartup(){
+    	explorerService.call( new RemoteCallback<Set<Option>>() {
+            @Override
+            public void callback( Set<Option> o ) {
+                if ( o != null && !o.isEmpty() ) {
+                    options.clear();
+                    options.addAll( o );
+                }
+                config();
+            }
+        }, new ErrorCallback<Object>() {
+            @Override
+            public boolean error( Object o,
+                                  Throwable throwable ) {
+                config();
+                return false;
+            }
+        }
+      ).getLastUserOptions();
+    }
+    
     private void config() {
         businessView.setIconSize( IconSize.SMALL );
         businessView.addClickHandler( new ClickHandler() {
@@ -156,6 +172,7 @@ public class ExplorerPresenterImpl implements ExplorerPresenter {
         } );
 
         if ( options.contains( Option.BUSINESS_CONTENT ) ) {
+        	//Window..alert("--- config ExplorerPresenterImpl");
             selectBusinessView();
             activateBusinessView();
         } else {
@@ -165,7 +182,12 @@ public class ExplorerPresenterImpl implements ExplorerPresenter {
 
         setupMenuItems();
         update();
+        
+        
+        //close();
     }
+    
+    
 
     private void setupMenuItems() {
         if ( options == null ) {
@@ -230,10 +252,10 @@ public class ExplorerPresenterImpl implements ExplorerPresenter {
     public UberView<ExplorerPresenterImpl> getView() {
         return this.view;
     }
-
+    
     @WorkbenchPartTitle
     public String getTitle() {
-        return ProjectExplorerConstants.INSTANCE.explorerTitle();
+        return "";
     }
 
     @DefaultPosition
@@ -258,7 +280,7 @@ public class ExplorerPresenterImpl implements ExplorerPresenter {
                                 return new ContextDropdownButton() {
                                     {
                                         displayCaret( false );
-                                        setRightDropdown( true );
+                                        setRightDropdown( false );
                                         setIcon( IconType.COG );
                                         setSize( MINI );
 
@@ -329,6 +351,7 @@ public class ExplorerPresenterImpl implements ExplorerPresenter {
 
     @Override
     public void selectBusinessView() {
+    	//Window.alert("*** selectBusinessView() -- ExplorerPresenterImpl");
         businessViewPresenter.setVisible( true );
         technicalViewPresenter.setVisible( false );
         options = businessViewPresenter.getActiveOptions();
@@ -366,5 +389,9 @@ public class ExplorerPresenterImpl implements ExplorerPresenter {
         } else if ( technicalViewPresenter.isVisible() ) {
             technicalViewPresenter.update( options );
         }
+    }
+    
+    public void close() {
+        closePlaceEvent.fire( new BeforeClosePlaceEvent( this.place ) );
     }
 }
