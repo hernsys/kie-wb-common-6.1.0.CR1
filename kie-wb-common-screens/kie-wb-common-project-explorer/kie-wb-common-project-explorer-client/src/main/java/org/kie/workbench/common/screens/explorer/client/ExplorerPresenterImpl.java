@@ -68,7 +68,7 @@ import com.google.gwt.user.client.ui.Widget;
  * Repository, Package, Folder and File explorer
  */
 @ApplicationScoped
-@WorkbenchScreen(identifier = "pepe")
+@WorkbenchScreen(identifier = "org.kie.guvnor.explorer")
 public class ExplorerPresenterImpl implements ExplorerPresenter {
 
     @Inject
