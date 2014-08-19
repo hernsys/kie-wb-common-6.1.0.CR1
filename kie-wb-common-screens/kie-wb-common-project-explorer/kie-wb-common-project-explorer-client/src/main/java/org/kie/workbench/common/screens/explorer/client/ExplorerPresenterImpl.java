@@ -44,7 +44,6 @@ import org.uberfire.client.annotations.WorkbenchScreen;
 import org.uberfire.client.common.ContextDropdownButton;
 import org.uberfire.client.mvp.UberView;
 import org.uberfire.client.workbench.events.BeforeClosePlaceEvent;
-import org.uberfire.lifecycle.OnClose;
 import org.uberfire.lifecycle.OnStartup;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.Position;
@@ -61,7 +60,6 @@ import com.github.gwtbootstrap.client.ui.constants.IconSize;
 import com.github.gwtbootstrap.client.ui.constants.IconType;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -172,7 +170,6 @@ public class ExplorerPresenterImpl implements ExplorerPresenter {
         } );
 
         if ( options.contains( Option.BUSINESS_CONTENT ) ) {
-        	//Window..alert("--- config ExplorerPresenterImpl");
             selectBusinessView();
             activateBusinessView();
         } else {
@@ -182,9 +179,6 @@ public class ExplorerPresenterImpl implements ExplorerPresenter {
 
         setupMenuItems();
         update();
-        
-        
-        //close();
     }
     
     
